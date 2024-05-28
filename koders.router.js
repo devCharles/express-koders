@@ -4,24 +4,36 @@ const kodersUsecase = require("./koders.usecase");
 // /koders
 const router = express.Router();
 
-router.get("/", (request, response) => {
-  try {
-    const koders = kodersUsecase.getAll();
-
-    response.json({
-      message: "All koders",
-      data: {
-        koders: koders,
-      },
-    });
-  } catch (error) {
-    response.status(error.status || 500);
-
-    response.json({
-      error: error.message,
-    });
-  }
+router.use((request, response, next) => {
+  console.log("Middleware a nivel de router (koders)");
+  next();
 });
+
+router.get(
+  "/",
+  (request, response, next) => {
+    console.log("middleware a nivel de ruta (get koders)", request.isAWizard);
+    next();
+  },
+  (request, response) => {
+    try {
+      const koders = kodersUsecase.getAll();
+
+      response.json({
+        message: "All koders",
+        data: {
+          koders: koders,
+        },
+      });
+    } catch (error) {
+      response.status(error.status || 500);
+
+      response.json({
+        error: error.message,
+      });
+    }
+  }
+);
 
 router.post("/", (request, response) => {
   try {
